@@ -19,7 +19,7 @@ datefmt='%Y-%m-%d.%H:%M:%S'
 
 logging.basicConfig(filename='logs/drone.json', level=logging.DEBUG,
 format='%(message)s',
-datefmt='%Y-%m-%d,%H:%M:%S')
+datefmt='%Y-%m-%d,%H:%M:%S.ffff')
 
 """
 @brief  Host IP address. 0.0.0.0 referring to current 
