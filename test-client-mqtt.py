@@ -1,41 +1,32 @@
 import paho.mqtt.client as mqtt
-import os.path
+from paho.mqtt.properties import Properties
+from paho.mqtt.packettypes import PacketTypes 
 
+# The callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
 
-# Replace /Users/gaston/certificates with the path
-# in which you saved the certificate authoritity file,
-# the client certificate file and the client key
-certificates_path = "/Users/gaston/certificates"
-ca_certificate = os.path.join(certificates_path, "ca.crt")
-client_certificate = os.path.join(certificates_path, "device001.crt")
-# Replace localhost with the IP for the Mosquitto
-# or other MQTT server
-mqtt_server_host = "localhost"
-mqtt_server_port = 8883
-mqtt_keepalive = 60
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("test/drone")
 
-def on_connect(client, userdata, rc):
-    print("Connect result: {}".format(mqtt.connack_string(rc)))
-    client.subscribe("test/drone01")
-
-def on_subscribe(client, userdata, mid, granted_qos):
-    print("Subscribed with QoS: {}".format(granted_qos[0]))
-
+# The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    payload_string = msg.payload.decode('utf-8')
-    print("Topic: {}. Payload: {}".format(
-        msg.topic, 
-        str(msg.payload)payload_string))
+    print(msg.topic+" "+str(msg.payload))
 
-if __name__ == "__main__":
-    client = mqtt.Client(protocol=mqtt.MQTTv311)
-    client.on_connect = on_connect
-    client.on_subscribe = on_subscribe
-    client.on_message = on_message
-    client.tls_set(ca_certs = ca_certificate,
-        certfile=client_certificate,
-        keyfile=client_key)
-    client.connect_async(host=mqtt_server_host,
-        port=mqtt_server_port,
-        keepalive=mqtt_keepalive) 
-     client.loop_forever()
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.connect("localhost", 1883, 60)
+
+properties=Properties(PacketTypes.PUBLISH)
+properties.MessageExpiryInterval=30 # in seconds
+    
+client.publish("test/drone",'Cedalo Mosquitto is awesome',2,properties=properties);
+
+# Blocking call that processes network traffic, dispatches callbacks and
+# handles reconnecting.
+# Other loop*() functions are available that give a threaded interface and a
+# manual interface.
+client.loop_forever()
