@@ -18,7 +18,10 @@ client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect("localhost", 1883, 60)
+mqttBroker ="192.168.0.4" 
+
+#client.connect(mqttBroker, 8883, 60)
+client.connect(mqttBroker)
 
 properties=Properties(PacketTypes.PUBLISH)
 properties.MessageExpiryInterval=30 # in seconds

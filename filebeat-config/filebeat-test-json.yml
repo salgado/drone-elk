@@ -1,0 +1,12 @@
+filebeat.inputs:
+- type: filestream
+  id: json-logging-example
+  paths:
+    - /Users/alexsalgado/Documents/uff/poc-elastic/tello-ai/drone-elk/logs/log.ndjson
+  parsers:
+    - ndjson: 
+        target: ""
+        add_error_key: true
+
+output.console:
+  pretty: true
